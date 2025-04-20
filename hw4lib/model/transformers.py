@@ -519,6 +519,7 @@ class EncoderDecoderTransformer(nn.Module):
         cls,
         decoder_checkpoint_path: str,
         config: dict,
+        freeze: bool = False,
     ) -> Tuple['EncoderDecoderTransformer', dict]:
         """
         Helper function to initialize an encoder-decoder transformer with decoder weights initialized from a pretrained decoder-only model.
@@ -547,7 +548,7 @@ class EncoderDecoderTransformer(nn.Module):
         transferred_params = []
         new_params = []
         
-        def transfer_module_weights(target_module, prefix):
+        def transfer_module_weights(target_module, prefix, freeze=freeze):
             module_state_dict = {
                 k.replace(prefix, ''): v 
                 for k, v in decoder_state_dict.items()
@@ -559,6 +560,11 @@ class EncoderDecoderTransformer(nn.Module):
             # Store the full parameter names with their prefix
             for name, param in target_module.named_parameters():
                 transferred_params.append((f"{prefix}{name}", param))
+
+                # If freeze is True, set requires_grad to False to freeze the parameters
+                if freeze:
+                    param.requires_grad = False
+                    print(f"  - Freezing {prefix}{name}")
 
         # Transfer shared components
         print("\nTransferring shared components:")

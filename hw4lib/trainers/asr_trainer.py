@@ -125,7 +125,7 @@ class ASRTrainer(BaseTrainer):
                 # TODO: Calculate CE loss
                 ce_loss = self.ce_criterion(
                     seq_out.view(-1, seq_out.size(-1)), 
-                    targets_shifted.view(-1)
+                    targets_golden.view(-1)
                 )
                 
                 
@@ -376,7 +376,7 @@ class ASRTrainer(BaseTrainer):
         if recognition_config is None:
             # Default config (greedy search)
             recognition_config = {
-                'num_batches': 5,
+                'num_batches': None,
                 'beam_width': 1,
                 'temperature': 1.0,
                 'repeat_penalty': 1.0,
